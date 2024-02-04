@@ -3,6 +3,7 @@ var cors = require('cors');
 const app = express();
 const port = 8081;
 
+
 const MOCK_CART_ID = 'MOCK_CART_ID';
 
 const _carts = {
@@ -44,6 +45,17 @@ const homeDelivery = {
 }
 
 app.use(cors());
+
+app.get('/', (req, res) => {
+  res.send(`
+    <img
+      src="https://www.mcdn.net/resources/shipping/MIO_STORE_PICKUP_66363011-6e1b-4494-834e-b236e1dd45d7.svg"
+      alt="Mio!"
+      loading="eager"
+      style="width: 200px"
+    />
+  `);
+});
 
 app.get('/api/cart/:cartId', (req, res) => {
   const cartId = req.params.cartId;
@@ -138,6 +150,20 @@ app.post('/api/cart/:cartId/delivery/:deliveryId', (req, res) => {
   
   cart.delivery = deliveryId;
 
+  res.contentType('application/json').send(cart);
+});
+
+app.post('/api/cart/:cartId/remove/:productId', (req, res) => {
+  const cartId = req.params.cartId;
+  const cart = _carts[cartId];
+
+  if (!cart) {
+    res.sendStatus(404);
+    return;
+  }
+
+  const productId = req.params.productId;
+  cart.products = cart.products.filter((p) => p.id !== productId);
   res.contentType('application/json').send(cart);
 });
 
